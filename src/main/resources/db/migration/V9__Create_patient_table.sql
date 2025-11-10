@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS patient (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    full_name VARCHAR(255),
+    gender ENUM('MALE','FEMALE','OTHER'),
+    dob DATE,
+    relation ENUM('SELF','SPOUSE','PARENT','CHILD','OTHER'),
+    phone VARCHAR(20),
+    avatar_url VARCHAR(1024),
+    ack_details BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

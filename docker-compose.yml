@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: hosdoc-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hosdoc
+      MYSQL_USER: hosdoc_user
+      MYSQL_PASSWORD: hosdoc_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - hosdoc-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  eureka:
+    image: hosdoc-eureka:latest
+    container_name: hosdoc-eureka
+    ports:
+      - "8761:8761"
+    networks:
+      - hosdoc-network
+    depends_on:
+      - mysql
+
+  auth-service:
+    image: hosdoc-auth:latest
+    container_name: hosdoc-auth
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hosdoc_auth?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka:8761/eureka
+    networks:
+      - hosdoc-network
+    depends_on:
+      - mysql
+      - eureka
+
+  backend:
+    build: .
+    container_name: hosdoc-backend
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hosdoc?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka:8761/eureka
+      APP_AUTH_JWK_SET_URI: http://auth-service:8081/auth/.well-known/jwks.json
+    networks:
+      - hosdoc-network
+    depends_on:
+      - mysql
+      - eureka
+      - auth-service
+    volumes:
+      - ./uploads:/app/uploads
+
+  gateway:
+    image: hosdoc-gateway:latest
+    container_name: hosdoc-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka:8761/eureka
+    networks:
+      - hosdoc-network
+    depends_on:
+      - eureka
+      - backend
+      - auth-service
+
+networks:
+  hosdoc-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+

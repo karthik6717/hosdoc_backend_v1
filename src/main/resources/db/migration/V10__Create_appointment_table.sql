@@ -1,0 +1,25 @@
+CREATE TABLE IF NOT EXISTS appointment (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    appointment_uid VARCHAR(50) UNIQUE NOT NULL,
+    doctor_id BIGINT NOT NULL,
+    patient_id BIGINT NOT NULL,
+    booked_by_user_id INT NOT NULL,
+    date DATE NOT NULL,
+    shift ENUM('MORNING','AFTERNOON','EVENING','NIGHT') NOT NULL,
+    slot_time TIME NOT NULL,
+    duration_minutes INT DEFAULT 30,
+    fee DECIMAL(10,2) NOT NULL,
+    payment_mode ENUM('ONLINE','PAY_AT_HOSPITAL') NOT NULL,
+    payment_status ENUM('PENDING','PAID','FAILED','REFUNDED') NOT NULL DEFAULT 'PENDING',
+    status ENUM('CONFIRMED','CANCELLED','COMPLETED','NO_SHOW') NOT NULL DEFAULT 'CONFIRMED',
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (doctor_id) REFERENCES doctor(id) ON DELETE RESTRICT,
+    FOREIGN KEY (patient_id) REFERENCES patient(id) ON DELETE RESTRICT,
+    INDEX idx_appointment_uid (appointment_uid),
+    INDEX idx_doctor_date (doctor_id, date),
+    INDEX idx_patient (patient_id),
+    INDEX idx_booked_by (booked_by_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
