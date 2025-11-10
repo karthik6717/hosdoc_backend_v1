@@ -13,17 +13,19 @@ public class OpenApiConfig {
 	@Bean
 	public OpenAPI customOpenAPI() {
 		return new OpenAPI()
-			.openapi("3.0.1")
 			.components(new Components()
-				.addSecuritySchemes("bearerAuth", new SecurityScheme()
-					.type(SecurityScheme.Type.HTTP)
-					.scheme("bearer")
-					.bearerFormat("JWT")
-					.description("JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"")))
+				.addSecuritySchemes("bearerAuth", 
+					new SecurityScheme()
+						.type(SecurityScheme.Type.HTTP)
+						.scheme("bearer")
+						.bearerFormat("JWT")
+				)
+			)
 			.info(new Info()
 				.title("HosDoc Backend API")
 				.version("1.0.0")
-				.description("REST API for HosDoc Hospital Management System"));
+				.description("REST API for HosDoc Hospital Management System")
+			);
 	}
 }
 
