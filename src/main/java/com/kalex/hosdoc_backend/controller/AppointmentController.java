@@ -63,7 +63,7 @@ public class AppointmentController {
 	@PostMapping("/{appointmentUid}/pay")
 	@Operation(summary = "Process payment for an appointment")
 	public ResponseEntity<?> payAppointment(@PathVariable String appointmentUid) {
-		// TODO: Implement
+		// TODO: I
 		return ResponseEntity.ok().build();
 	}
 }
